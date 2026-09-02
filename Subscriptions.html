@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subscriptions - SL RAP</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0f0f0f;
+    color: #fff;
+    font-family: Roboto, Arial, sans-serif;
+    padding-bottom: 60px;
+  }
+
+.category-title {
+  font-size: 22px;
+  font-weight: 600;
+  padding: 20px 16px 12px 16px;
+  color: #fff;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  gap: 16px;
+  position: relative;
+}
+
+/* Circle icon link */
+.channel-link {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: block;
+  text-decoration: none;
+}
+.circle-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #333;
+  overflow: hidden;
+}
+.circle-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.item-name {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* දකුණු පැත්තේ කතිර ලකුණ */
+.close-btn {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+.close-btn:hover {
+  opacity: 1;
+}
+.close-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: #aaa;
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #0f0f0f;
+    border-top: 1px solid #222;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0 6px 0;
+  }
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    color: #aaa;
+    text-decoration: none;
+  }
+.nav-item.active { color: #fff; }
+.nav-item.active svg {
+  fill: #fff;
+}
+.nav-item svg {
+  width: 24px;
+  height: 24px;
+  fill: #aaa;
+  transition: fill 0.2s;
+}
+</style>
+</head>
+<body>
+
+  <!-- Category Title -->
+  <div class="category-title">Subscriptions</div>
+
+  <!-- List Item - Circle icon + Name + X button -->
+  <div class="list-item">
+    <a href="Channel_View.html" class="channel-link">
+      <div class="circle-icon">
+        <img src="icon1.jpg" alt="icon">
+      </div>
+    </a>
+    <div class="item-name">Rasthiyadu Padanama</div>
+    
+    <!-- දකුණු කෙළවර කතිර ලකුණ -->
+    <div class="close-btn" onclick="removeItem(this)">
+      <svg viewBox="0 0 24 24">
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Bottom Nav - SVG icons + links -->
+  <div class="bottom-nav">
+    <a href="Home_Page.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <div>Home</div>
+    </a>
+    <a href="Trending.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+      <div>Trending</div>
+    </a>
+    <a href="Subscriptions.html" class="nav-item active">
+      <svg viewBox="0 0 24 24"><path d="M20 8H4v10h16V8zm-2 8H6v-6h12v6zM6 6h12v2H6z"/></svg>
+      <div>Subscriptions</div>
+    </a>
+    <a href="Profile.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <div>Profile</div>
+    </a>
+  </div>
+
+<script>
+function removeItem(btn) {
+  // කතිරේ click කරොත් මුළු list-item එකම අයින් කරනවා
+  const item = btn.closest('.list-item');
+  item.style.display = 'none';
+}
+</script>
+
+</body>
+</html>

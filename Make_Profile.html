@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Make Profile - SL RAP</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0f0f0f;
+    color: #fff;
+    font-family: Roboto, Arial, sans-serif;
+    padding: 24px 16px 56px 16px;
+  }
+
+.page-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 32px;
+  color: #fff;
+}
+
+.upload-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+  position: relative;
+}
+.profile-upload {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #0f0f0f;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+.profile-upload img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.upload-icon {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 32px;
+  background: #333;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: 3px solid #0f0f0f;
+}
+.upload-icon.delete {
+  background: #333;
+  font-size: 16px;
+}
+
+input, textarea {
+  width: 100%;
+  background: #1a1a1a;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  color: #fff;
+  font-size: 16px;
+  font-family: Roboto, Arial, sans-serif;
+}
+input::placeholder, textarea::placeholder {
+  color: #666;
+}
+textarea {
+  resize: none;
+  min-height: 80px;
+}
+
+.next-btn {
+  width: 100%;
+  padding: 14px;
+  background: white;
+  color: black;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+input[type="file"] {
+  display: none;
+}
+</style>
+</head>
+<body>
+
+  <div class="page-title">Make Profile</div>
+
+  <!-- Profile Photo Upload -->
+  <div class="upload-wrap">
+    <label for="fileInput" class="profile-upload">
+      <img id="preview" src="Default_User.png" alt="profile">
+      <div class="upload-icon" id="icon">↑</div>
+    </label>
+    <input type="file" id="fileInput" accept="image/*">
+  </div>
+
+  <!-- Form Fields -->
+  <input type="text" placeholder="Username" value="User_01">
+  <input type="password" placeholder="Password">
+  <input type="channel_name" placeholder="Channel Name">
+  <textarea placeholder="About">I am Sri Lankan Rap Fan.</textarea>
+
+  <!-- Next Button -->
+  <button class="next-btn" onclick="window.location.href='Home_Page.html'">Next</button>
+
+<script>
+const fileInput = document.getElementById('fileInput');
+const preview = document.getElementById('preview');
+const icon = document.getElementById('icon');
+
+if(preview.src.includes('Default_User.png') || preview.src === '') {
+  icon.innerHTML = '↑';
+  icon.classList.remove('delete');
+} else {
+  icon.innerHTML = '×';
+  icon.classList.add('delete');
+}
+
+fileInput.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      icon.innerHTML = '×';
+      icon.classList.add('delete');
+    }
+    reader.readAsDataURL(file);
+  }
+});
+
+icon.addEventListener('click', function(e) {
+  e.preventDefault();
+  if(icon.classList.contains('delete')) {
+    preview.src = 'Default_User.png';
+    icon.innerHTML = '↑';
+    icon.classList.remove('delete');
+    fileInput.value = '';
+  }
+});
+</script>
+
+</body>
+</html>

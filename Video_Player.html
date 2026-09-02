@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Player - SL RAP</title>
+<!-- Google Identity Services Library for OAuth authentication -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<!-- YouTube IFrame Player API -->
+<script src="https://www.youtube.com/iframe_api"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @font-face {
+    font-family: 'SLFont';
+    src: url('OldLondon.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  body {
+    background: #0f0f0f;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    padding-bottom: 70px;
+  }
+
+  /* Topbar Styling */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    position: sticky;
+    top: 0;
+    background: #0f0f0f;
+    z-index: 100;
+    border-bottom: 1px solid #222;
+  }
+  .topbar .logo { 
+    font-size: 26px; 
+    font-weight: 900; 
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .topbar .logo .sl {
+    font-size: 26px;
+    color: #ff0000;
+    font-family: 'SLFont', Impact, sans-serif;
+    letter-spacing: 1px;
+  }
+  .topbar .right-icons {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .topbar .right-icons a svg, .topbar .right-icons button svg {
+    width: 24px;
+    height: 24px;
+    fill: #aaa;
+    cursor: pointer;
+    transition: fill 0.2s;
+  }
+  .topbar .right-icons a:active svg {
+    fill: #fff;
+  }
+
+  /* Sticky Player Container */
+  .player-container {
+    position: sticky;
+    top: 53px;
+    z-index: 90;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+  }
+  .player-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* Video Details Section */
+  .video-primary-info {
+    padding: 14px 16px;
+    border-bottom: 1px solid #222;
+  }
+  .video-title-main {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  .video-stats-meta {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 12px;
+  }
+
+  /* Channel Bar & Subscribe Button */
+  .channel-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .channel-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: #fff;
+  }
+  .channel-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #333;
+    object-fit: cover;
+  }
+  .channel-name-container {
+    display: flex;
+    flex-direction: column;
+  }
+  .channel-name {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .sub-count {
+    font-size: 12px;
+    color: #aaa;
+  }
+  .sub-btn {
+    background: #fff;
+    color: #0f0f0f;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 18px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .sub-btn.subscribed {
+    background: #272727;
+    color: #fff;
+  }
+
+  /* Action Buttons Bar (Like, Share, Save etc.) */
+  .action-buttons-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .action-buttons-scroll::-webkit-scrollbar { display: none; }
+
+  .action-btn-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #272727;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 18px;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .action-btn-pill.active {
+    background: #fff;
+    color: #000;
+  }
+  .action-btn-pill svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+
+  /* Comments Preview Section */
+  .comments-section {
+    padding: 14px 16px;
+    border-bottom: 8px solid #222;
+    background: #121212;
+  }
+  .comments-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .comments-count {
+    color: #aaa;
+    font-weight: normal;
+    margin-left: 6px;
+  }
+  .add-comment-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .add-comment-input {
+    flex: 1;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 20px;
+    padding: 8px 14px;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+  }
+  .post-comment-btn {
+    background: #cc0000;
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .comment-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .comment-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #444;
+  }
+  .comment-text-box {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .comment-author {
+    font-weight: bold;
+    color: #aaa;
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
+
+  /* Infinite Up Next / Related Video List */
+  .up-next-section {
+    padding: 12px 0;
+  }
+  .section-title {
+    padding: 0 16px 12px 16px;
+    font-size: 15px;
+    font-weight: bold;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .video-card { padding: 0 0 16px 0; margin-bottom: 8px; position: relative; }
+  .thumbnail-link {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #222;
+    text-decoration: none;
+  }
+  .thumbnail { width: 100%; height: 100%; }
+  .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+  .video-info {
+    display: flex;
+    padding: 12px 16px 0 16px;
+    gap: 12px;
+    align-items: flex-start;
+    position: relative;
+  }
+  .channel-link {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+    display: block;
+  }
+  .channel-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #333;
+    overflow: hidden;
+  }
+  .channel-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .video-details { flex: 1; min-width: 0; }
+  .video-title {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: #fff;
+  }
+  .video-meta-sub {
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 4px;
+  }
+  .menu-dots {
+    font-size: 20px;
+    color: #aaa;
+    padding: 4px;
+    cursor: pointer;
+    position: relative;
+  }
+  .menu-dots svg { width: 24px; height: 24px; fill: #aaa; }
+
+  /* Save/Share Menu Popup */
+  .save-menu {
+    position: absolute;
+    right: 40px;
+    top: 0;
+    background: #282828;
+    border-radius: 4px;
+    padding: 4px 0;
+    min-width: 180px;
+    display: none;
+    z-index: 20;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.5);
+  }
+  .save-menu.show { display: block; }
+  .save-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #fff;
+  }
+  .save-item:hover { background: #3a3a3a; }
+  .save-item svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2;
+    flex-shrink: 0;
+  }
+  .save-item.saved svg { fill: #fff; stroke: #fff; }
+
+  /* Bottom Navigation */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #0f0f0f;
+    border-top: 1px solid #222;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0 6px 0;
+    z-index: 100;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    color: #aaa;
+    text-decoration: none;
+  }
+  .nav-item.active { color: #fff; }
+  .nav-item.active svg { fill: #fff; }
+  .nav-item svg {
+    width: 24px;
+    height: 24px;
+    fill: #aaa;
+    transition: fill 0.2s;
+  }
+
+  /* Loader */
+  .loader {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="logo"><span class="sl">SL</span> RAP</div>
+    <div class="right-icons">
+      <a href="Notifications.html">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
+        </svg>
+      </a>
+      <a href="Search.html">
+        <svg viewBox="0 0 24 24">
+          <path d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Video Player Section -->
+  <div class="player-container">
+    <div id="youtube-player"></div>
+  </div>
+
+  <!-- Main Active Video Info & Interactivity -->
+  <div class="video-primary-info">
+    <h1 class="video-title-main" id="currentTitle">Hadahana 44 Kalliya x Rasthiyadu Padanama x Fill T</h1>
+    <div class="video-stats-meta" id="currentMeta">1.2M views • 3 days ago</div>
+
+    <!-- Channel Info & Subscribe -->
+    <div class="channel-bar">
+      <a href="Channel_View.html" class="channel-left">
+        <img src="icon1.jpg" id="currentChannelIcon" class="channel-avatar" alt="Channel">
+        <div class="channel-name-container">
+          <span class="channel-name" id="currentChannelName">44 Kalliya Official</span>
+          <span class="sub-count" id="currentSubCount">450K subscribers</span>
+        </div>
+      </a>
+      <button class="sub-btn" id="subBtn" onclick="toggleSubscribe()">Subscribe</button>
+    </div>
+
+    <!-- Scrollable Action Buttons (Like, Dislike, Share, Save) -->
+    <div class="action-buttons-scroll">
+      <button class="action-btn-pill" id="likeBtn" onclick="toggleLike()">
+        <svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.58 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>
+        <span id="likeCount">45K</span>
+      </button>
+
+      <button class="action-btn-pill" id="dislikeBtn" onclick="toggleDislike()">
+        <svg viewBox="0 0 24 24"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
+        <span>Dislike</span>
+      </button>
+
+      <button class="action-btn-pill" onclick="shareVideo()">
+        <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+        <span>Share</span>
+      </button>
+
+      <button class="action-btn-pill" id="savePillBtn" onclick="toggleSaveMain()">
+        <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+        <span id="savePillText">Save</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Comments Section -->
+  <div class="comments-section">
+    <div class="comments-header">
+      <div>Comments <span class="comments-count" id="commentCount">1,240</span></div>
+    </div>
+    <div class="add-comment-box">
+      <input type="text" id="commentInput" class="add-comment-input" placeholder="Add a comment...">
+      <button class="post-comment-btn" onclick="postComment()">Post</button>
+    </div>
+    <div id="commentsList">
+      <div class="comment-item">
+        <div class="comment-avatar"></div>
+        <div class="comment-text-box">
+          <div class="comment-author"> Kasun Perera • 2h ago</div>
+          <div>This track is absolutely fire! Best rap collaboration this year 🔥</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related/Scrollable Videos List (Up Next) -->
+  <div class="up-next-section">
+    <div class="section-title">Up Next</div>
+    <div class="video-list" id="videoFeed">
+      <!-- Dynamic list items will be generated here -->
+    </div>
+    <div class="loader" id="loader">Loading more videos...</div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <a href="Home_Page.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <div>Home</div>
+    </a>
+    <a href="Trending.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+      <div>Trending</div>
+    </a>
+    <a href="Subscriptions.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M20 8H4v10h16V8zm-2 8H6v-6h12v6zM6 6h12v2H6z"/></svg>
+      <div>Subscriptions</div>
+    </a>
+    <a href="Profile.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <div>Profile</div>
+    </a>
+  </div>
+
+<script>
+  // Configuration
+  const API_KEY = 'AIzaSyDgGPIoJk7KTjBDD2iLxjCeEJg_-eV2XVM'; // YouTube API Key
+  let currentVideoId = 'L_LUpnjgPso'; // Default video ID
+  let currentChannelId = 'UC_x5XG1OV2P6uZZ5FSM9Ttw'; 
+  let player;
+  let isSubscribed = false;
+  let isLiked = false;
+
+  // Mock Feed Videos for Infinite Scroll Demo
+  const mockFeed = [
+    { id: 'dQw4w9WgXcQ', title: 'Fill T x Smokio - Rap Sinhala Hits', channel: 'Sinhala Rap Central', views: '850K', time: '1 week ago', thumb: 'thumb2.jpg', channelThumb: 'icon2.jpg', channelId: 'UC1' },
+    { id: '3JZ_D3ELwOQ', title: 'Rasthiyadu Padanama Live Performance 2026', channel: 'Street Underground', views: '420K', time: '2 days ago', thumb: 'thumb3.jpg', channelThumb: 'icon3.jpg', channelId: 'UC2' },
+    { id: 'L_LUpnjgPso', title: 'Hadahana 44 Kalliya x Rasthiyadu Padanama', channel: '44 Kalliya Official', views: '1.2M', time: '3 days ago', thumb: 'thumb1.jpg', channelThumb: 'icon1.jpg', channelId: 'UC3' }
+  ];
+
+  // Initialize YouTube Player
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('youtube-player', {
+      videoId: currentVideoId,
+      playerVars: {
+        'autoplay': 1,
+        'playsinline': 1,
+        'rel': 0
+      }
+    });
+  }
+
+  window.onload = function() {
+    renderFeed();
+  };
+
+  // API Interactivity Actions
+  function toggleSubscribe() {
+    const btn = document.getElementById('subBtn');
+    isSubscribed = !isSubscribed;
+
+    if (isSubscribed) {
+      btn.textContent = 'Subscribed';
+      btn.classList.add('subscribed');
+    } else {
+      btn.textContent = 'Subscribe';
+      btn.classList.remove('subscribed');
+    }
+  }
+
+  function toggleLike() {
+    const btn = document.getElementById('likeBtn');
+    isLiked = !isLiked;
+
+    if (isLiked) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  }
+
+  function toggleDislike() {
+    const btn = document.getElementById('dislikeBtn');
+    btn.classList.toggle('active');
+  }
+
+  function postComment() {
+    const input = document.getElementById('commentInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    // Append to UI immediately
+    const commentsList = document.getElementById('commentsList');
+    const newComment = document.createElement('div');
+    newComment.className = 'comment-item';
+    newComment.innerHTML = `
+      <div class="comment-avatar"></div>
+      <div class="comment-text-box">
+        <div class="comment-author">You • Just now</div>
+        <div>${text}</div>
+      </div>
+    `;
+    commentsList.prepend(newComment);
+    input.value = '';
+  }
+
+  function toggleSaveMain() {
+    const pill = document.getElementById('savePillBtn');
+    const text = document.getElementById('savePillText');
+    pill.classList.toggle('active');
+    text.textContent = pill.classList.contains('active') ? 'Saved' : 'Save';
+  }
+
+  function loadVideo(id, title, channel, views, time, thumb, channelThumb, channelId) {
+    currentVideoId = id;
+    currentChannelId = channelId;
+    if (player && player.loadVideoById) {
+      player.loadVideoById(id);
+    }
+    document.getElementById('currentTitle').textContent = title;
+    document.getElementById('currentMeta').textContent = `${views} views • ${time}`;
+    document.getElementById('currentChannelName').textContent = channel;
+    document.getElementById('currentChannelIcon').src = channelThumb;
+    
+    // Reset state
+    isSubscribed = false;
+    isLiked = false;
+    document.getElementById('subBtn').textContent = 'Subscribe';
+    document.getElementById('subBtn').classList.remove('subscribed');
+    document.getElementById('likeBtn').classList.remove('active');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Render Infinite Video Scroll
+  function renderFeed() {
+    const container = document.getElementById('videoFeed');
+    mockFeed.forEach(v => {
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      card.innerHTML = `
+        <div class="thumbnail-link" onclick="loadVideo('${v.id}', '${v.title.replace(/'/g, "\'")}', '${v.channel.replace(/'/g, "\'")}', '${v.views}', '${v.time}', '${v.thumb}', '${v.channelThumb}', '${v.channelId}')">
+          <div class="thumbnail">
+            <img src="${v.thumb}" alt="${v.title}">
+          </div>
+        </div>
+        <div class="video-info">
+          <a href="Channel_View.html" class="channel-link">
+            <div class="channel-icon">
+              <img src="${v.channelThumb}" alt="">
+            </div>
+          </a>
+          <div class="video-details" onclick="loadVideo('${v.id}', '${v.title.replace(/'/g, "\'")}', '${v.channel.replace(/'/g, "\'")}', '${v.views}', '${v.time}', '${v.thumb}', '${v.channelThumb}', '${v.channelId}')">
+            <div class="video-title">${v.title}</div>
+            <div class="video-meta-sub">${v.channel} • ${v.views} views • ${v.time}</div>
+          </div>
+          <div class="menu-dots" onclick="toggleSaveMenu(this)">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+            <div class="save-menu">
+              <div class="save-item" onclick="toggleSave(event, this)">
+                <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+                <span>Save</span>
+              </div>
+              <div class="save-item" onclick="shareVideo(event)">
+                <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+                <span>Share</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  // Infinite Scroll Listener
+  window.addEventListener('scroll', () => {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
+      renderFeed(); // Appends more videos seamlessly on scroll
+    }
+  });
+
+  function toggleSaveMenu(el) {
+    event.stopPropagation();
+    const menu = el.querySelector('.save-menu');
+    document.querySelectorAll('.save-menu').forEach(m => {
+      if(m !== menu) m.classList.remove('show');
+    });
+    menu.classList.toggle('show');
+  }
+
+  function toggleSave(e, el) {
+    e.stopPropagation();
+    el.classList.toggle('saved');
+    const text = el.querySelector('span');
+    text.textContent = el.classList.contains('saved') ? 'Saved' : 'Save';
+    document.querySelectorAll('.save-menu').forEach(m => m.classList.remove('show'));
+  }
+
+  function shareVideo(e) {
+    if(e) e.stopPropagation();
+    alert('Share link copied to clipboard!');
+    document.querySelectorAll('.save-menu').forEach(m => m.classList.remove('show'));
+  }
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.save-menu').forEach(m => m.classList.remove('show'));
+  });
+</script>
+</body>
+</html>
