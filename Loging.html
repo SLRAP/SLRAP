@@ -4,127 +4,153 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login - SL RAP</title>
+
+<!-- Google Identity Services Library -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 <style>
+  * {
+    box-sizing: border-box;
+  }
+
   body {
     background: #0f0f0f;
-    color: white;
-    font-family: Arial, sans-serif;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    text-align: center;
   }
 
   .container {
-    width: 90%;
+    width: 100%;
     max-width: 380px;
-    padding: 20px;
+    padding: 32px 24px;
+    background: #141414;
+    border: 1px solid #262626;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    text-align: center;
   }
 
   h1 {
-    font-size: 32px;
-    margin-bottom: 30px;
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    letter-spacing: 1px;
   }
 
   p {
-    font-size: 18px;
-    margin: 20px 0 8px 0;
-    color: #ccc;
+    font-size: 14px;
+    margin: 0 0 28px 0;
+    color: #a3a3a3;
+    line-height: 1.5;
   }
 
-  input[type="text"], input[type="password"] {
-    width: 100%;
-    padding: 14px;
-    background: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 25px;
-    color: white;
-    font-size: 16px;
-    box-sizing: border-box;
-    outline: none;
-    margin-bottom: 12px;
-  }
-
-  input:focus {
-    border-color: #555;
-  }
-
-  .btn-google {
-    width: 100%;
-    padding: 14px;
-    margin-top: 25px;
-    background: white;
-    color: black;
-    border: none;
-    border-radius: 25px;
-    font-size: 16px;
-    font-weight: 500;
+  /* Google Button Container Styling */
+  .google-btn-wrapper {
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 10px;
-    cursor: pointer;
+    width: 100%;
+    min-height: 44px;
   }
 
-  .checkbox {
-    margin: 25px 0 15px 0;
-    font-size: 15px;
+  .checkbox-container {
+    margin-top: 24px;
+    font-size: 13px;
+    color: #a3a3a3;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
   }
 
-  .checkbox a {
-    color: #4da3ff;
+  .checkbox-container input[type="checkbox"] {
+    accent-color: #3b82f6;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+
+  .checkbox-container a {
+    color: #3b82f6;
     text-decoration: none;
   }
 
-  .checkbox a:hover {
+  .checkbox-container a:hover {
     text-decoration: underline;
-  }
-
-  .btn-next {
-    width: 100%;
-    padding: 14px;
-    background: white;
-    color: black;
-    border: none;
-    border-radius: 25px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
   }
 </style>
 </head>
 <body>
+
   <div class="container">
     <h1>LOGIN</h1>
+    <p>Sign in with Google to access your account</p>
     
-    <p>Already have a Account</p>
-    <input type="text" placeholder="Username">
-    <input type="password" placeholder="Password">
-    
-    <p>Not have a Account</p>
-    
-    <button class="btn-google">
-      <svg width="20" height="20" viewBox="0 0 48 48">
-        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v8.51h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.14z"/>
-        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-      </svg>
-      Continue with Google
-    </button>
-    
-    <div class="checkbox">
-      <input type="checkbox" id="privacy" required>
-      <label for="privacy">I Accept <a href="Privacy_Policy.html" target="_blank">Privacy Policy</a></label>
+    <!-- Official Google Button Injection Area -->
+    <div class="google-btn-wrapper">
+      <div id="g_id_onload"></div>
     </div>
     
-    <button class="btn-next">Next</button>
+    <div class="checkbox-container">
+      <input type="checkbox" id="privacy">
+      <label for="privacy">I Accept <a href="Privacy_Policy.html" target="_blank">Privacy Policy</a></label>
+    </div>
   </div>
+
+  <script>
+    function handleCredentialResponse(response) {
+      const isAccepted = document.getElementById('privacy').checked;
+      
+      if (!isAccepted) {
+        alert("Please accept the Privacy Policy to proceed!");
+        return;
+      }
+
+      // JWT Token Decode කිරීම
+      const responsePayload = parseJwt(response.credential);
+
+      // User details LocalStorage හි තැන්පත් කිරීම
+      localStorage.setItem("user_name", responsePayload.name);
+      localStorage.setItem("user_email", responsePayload.email);
+      localStorage.setItem("user_picture", responsePayload.picture);
+
+      // Next Page එකට Redirect කිරීම
+      window.location.href = "home.html"; 
+    }
+
+    function parseJwt(token) {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+
+      return JSON.parse(jsonPayload);
+    }
+
+    window.onload = function () {
+      // Google ID Initialization
+      google.accounts.id.initialize({
+        client_id: "140925428903-r1sltvfvsmovqo1qlq39dqcvgbihunnt.apps.googleusercontent.com",
+        callback: handleCredentialResponse
+      });
+
+      // Render Official Google Sign-In Button with High Quality Design
+      google.accounts.id.renderButton(
+        document.getElementById("g_id_onload"),
+        { 
+          theme: "filled_blue", // standard dark/blue UI (Options: "outline", "filled_blue", "filled_black")
+          size: "large",         // Button Size (large, medium, small)
+          shape: "pill",         // Rounded Corners / Capsule shape
+          width: 320,            // Clean fixed width
+          logo_alignment: "left"
+        }
+      );
+    }
+  </script>
 </body>
 </html>
