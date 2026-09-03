@@ -3,320 +3,548 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Home Page - SL RAP</title>
+<title>Dashboard - SL RAP</title>
+
+<!-- Google Identity Services Library & GAPI Integration -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://apis.google.com/js/api.js" async defer></script>
+
 <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  @font-face {
-    font-family: 'SLFont';
-    src: url('OldLondon.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-
+  * { box-sizing: border-box; }
   body {
-    background: #0f0f0f;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    padding-bottom: 60px;
+    background: #080c14;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 20px;
   }
 
-.topbar {
+  .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
-    position: sticky;
-    top: 0;
-    background: #0f0f0f;
-    z-index: 10;
-    border-bottom: 1px solid #222;
+    background: rgba(18, 24, 38, 0.85);
+    backdrop-filter: blur(12px);
+    padding: 12px 24px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 24px;
   }
-.topbar .logo { 
-  font-size: 26px; 
-  font-weight: 900; 
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: #fff;
-}
-.topbar .logo .sl {
-  font-size: 26px;
-  color: #ff0000;
-  font-family: 'SLFont', Impact, sans-serif;
-  letter-spacing: 1px;
-}
-.topbar .right-icons {
+
+  .user-profile {
     display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .user-profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #3b82f6;
+  }
+
+  .logout-btn {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
   }
-.topbar .right-icons a svg {
-  width: 24px;
-  height: 24px;
-  fill: #aaa;
-  cursor: pointer;
-  transition: fill 0.2s;
-}
-.topbar .right-icons a:active svg {
-  fill: #fff;
-}
 
-.video-list { padding: 8px 0; }
-.video-card { padding: 0 0 16px 0; margin-bottom: 8px; position: relative; }
-
-/* Thumbnail link */
-.thumbnail-link {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16/9;
-  background: #222;
-  text-decoration: none;
-}
-.thumbnail {
-    width: 100%;
-    height: 100%;
-  }
-.thumbnail img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  .card {
+    background: rgba(18, 24, 38, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 16px;
   }
 
-.video-info {
-    display: flex;
-    padding: 12px 16px 0 16px;
-    gap: 12px;
-    align-items: flex-start;
-    position: relative;
-  }
-
-/* Channel icon link */
-.channel-link {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  overflow: hidden;
-  display: block;
-}
-.channel-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #333;
-    overflow: hidden;
-  }
-.channel-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-.video-details {
-    flex: 1;
-    min-width: 0;
-  }
-.video-title {
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-.menu-dots {
-    font-size: 20px;
-    color: #aaa;
-    padding: 4px;
+  h2 { font-size: 18px; margin-top: 0; color: #60a5fa; }
+  .sync-status { font-size: 13px; color: #94a3b8; margin-bottom: 15px; }
+  
+  .btn {
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
     cursor: pointer;
-    position: relative;
+    font-weight: 600;
+    margin-right: 8px;
   }
-.menu-dots svg {
-  width: 24px;
-  height: 24px;
-  fill: #aaa;
-}
-
-/* Save Share menu */
-.save-menu {
-  position: absolute;
-  right: 40px;
-  top: 0;
-  background: #282828;
-  border-radius: 4px;
-  padding: 4px 0;
-  min-width: 180px;
-  display: none;
-  z-index: 20;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.5);
-}
-.save-menu.show {
-  display: block;
-}
-.save-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 10px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  color: #fff;
-}
-.save-item:hover {
-  background: #3a3a3a;
-}
-.save-item svg {
-  width: 24px;
-  height: 24px;
-  fill: none;
-  stroke: #fff;
-  stroke-width: 2;
-  flex-shrink: 0;
-}
-.save-item.saved svg {
-  fill: #fff;
-  stroke: #fff;
-}
-
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #0f0f0f;
-    border-top: 1px solid #222;
-    display: flex;
-    justify-content: space-around;
-    padding: 8px 0 6px 0;
-  }
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    font-size: 10px;
-    color: #aaa;
-    text-decoration: none;
-  }
-.nav-item.active { color: #fff; }
-.nav-item.active svg {
-  fill: #fff;
-}
-.nav-item svg {
-  width: 24px;
-  height: 24px;
-  fill: #aaa;
-  transition: fill 0.2s;
-}
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>
 </head>
 <body>
 
-  <div class="topbar">
-    <div class="logo"><span class="sl">SL</span> RAP</div>
-    <div class="right-icons">
-      <a href="Notifications.html">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
-        </svg>
-      </a>
-      <a href="Search.html">
-        <svg viewBox="0 0 24 24">
-          <path d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
-        </svg>
-      </a>
-    </div>
-  </div>
-
-  <div class="video-list">
-    <div class="video-card">
-      <!-- Thumbnail click = video page එකට -->
-      <a href="Video_Player.html" class="thumbnail-link">
-        <div class="thumbnail">
-          <img src="thumb1.jpg" alt="">
-        </div>
-      </a>
-      
-      <div class="video-info">
-        <!-- Channel icon click = channel page එකට -->
-        <a href="Channel_View.html" class="channel-link">
-          <div class="channel-icon">
-            <img src="icon1.jpg" alt="">
-          </div>
-        </a>
-        
-        <div class="video-details">
-          <div class="video-title">Hadahana 44 Kalliya x Rasthiyadu Padanama x Fill T</div>
-        </div>
-        <div class="menu-dots" onclick="toggleSaveMenu(this)">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-          </svg>
-          <div class="save-menu">
-            <div class="save-item" onclick="toggleSave(event, this)">
-              <svg viewBox="0 0 24 24">
-                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
-              </svg>
-              <span>Save</span>
-            </div>
-            <div class="save-item" onclick="shareVideo(event)">
-              <svg viewBox="0 0 24 24">
-                <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
-              </svg>
-              <span>Share</span>
-            </div>
-          </div>
-        </div>
+  <!-- Top Navbar -->
+  <div class="navbar">
+    <div style="font-weight: 800; font-size: 20px; letter-spacing: 1px;">SL RAP</div>
+    <div class="user-profile">
+      <img id="userImg" src="" alt="Profile">
+      <div>
+        <div id="userName" style="font-weight: 600; font-size: 14px;">User</div>
+        <div id="userEmail" style="font-size: 12px; color: #94a3b8;">email</div>
       </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
   </div>
 
-  <div class="bottom-nav">
-    <a href="Home_Page.html" class="nav-item active">
-      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      <div>Home</div>
-    </a>
-    <a href="Trending.html" class="nav-item">
-      <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
-      <div>Trending</div>
-    </a>
-    <a href="Subscriptions.html" class="nav-item">
-      <svg viewBox="0 0 24 24"><path d="M20 8H4v10h16V8zm-2 8H6v-6h12v6zM6 6h12v2H6z"/></svg>
-      <div>Subscriptions</div>
-    </a>
-    <a href="Profile.html" class="nav-item">
-      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-      <div>Profile</div>
-    </a>
+  <!-- Dashboard Main Grid -->
+  <div class="grid-container">
+    <!-- Public Channels Box -->
+    <div class="card">
+      <h2>Public Rap Channels</h2>
+      <div id="channelsList" style="font-size: 14px; color: #94a3b8;">Loading channels from database...</div>
+    </div>
+
+    <!-- Private Drive Sync Box -->
+    <div class="card">
+      <h2>Private Data (Google Drive AppData)</h2>
+      <p class="sync-status" id="driveStatus">Status: Authorization Required</p>
+      <button class="btn" id="syncBtn" onclick="requestDriveAccessToken()">Sync / Load Drive Data</button>
+      <button class="btn" id="saveBtn" onclick="saveFavoritesToDrive()" style="display:none; background:#10b981;">Save Sample Favorite</button>
+      <div id="favoritesDisplay" style="margin-top: 15px; font-size: 13px; color: #cbd5e1;"></div>
+    </div>
   </div>
 
-<script>
-function toggleSaveMenu(el) {
-  event.stopPropagation();
-  const menu = el.querySelector('.save-menu');
-  document.querySelectorAll('.save-menu').forEach(m => {
-    if(m !== menu) m.classList.remove('show');
-  });
-  menu.classList.toggle('show');
-}
+  <script>
+    const CLIENT_ID = '140925428903-r1sltvfvsmovqo1qlq39dqcvgbihunnt.apps.googleusercontent.com';
+    const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
+    
+    let tokenClient;
+    let accessToken = null;
+    let driveFileId = null;
 
-function toggleSave(e, el) {
-  e.stopPropagation();
-  el.classList.toggle('saved');
-  const text = el.querySelector('span');
-  text.textContent = el.classList.contains('saved') ? 'Saved' : 'Save';
-  document.querySelectorAll('.save-menu').forEach(m => m.classList.remove('show'));
-}
+    // 1. Auth Guard & Page Load
+    window.onload = function() {
+      const name = localStorage.getItem("user_name");
+      const email = localStorage.getItem("user_email");
+      const pic = localStorage.getItem("user_picture");
 
-function shareVideo(e) {
-  e.stopPropagation();
-  alert('Share link copied');
-  document.querySelectorAll('.save-menu').forEach(m => m.classList.remove('show'));
-}
+      if (!email) {
+        window.location.href = "index.html";
+        return;
+      }
 
-document.addEventListener('click', () => {
-  document.querySelectorAll('.save-menu').forEach(m => m.classList.remove('show'));
-});
-</script>
+      document.getElementById("userName").innerText = name || "User";
+      document.getElementById("userEmail").innerText = email || "";
+      document.getElementById("userImg").src = pic || "https://via.placeholder.com/40";
 
+      fetchPublicChannels();
+      initTokenClient();
+    };
+
+    // 2. Google OAuth Token Client (Drive Scope) Initializing
+    function initTokenClient() {
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: async (tokenResponse) => {
+          if (tokenResponse && tokenResponse.access_token) {
+            accessToken = tokenResponse.access_token;
+            document.getElementById("driveStatus").innerText = "Status: Connected to Google Drive AppData";
+            document.getElementById("saveBtn").style.display = "inline-block";
+            await syncDriveData();
+          }
+        },
+      });
+    }
+
+    function requestDriveAccessToken() {
+      tokenClient.requestAccessToken({ prompt: 'consent' });
+    }
+
+    // 3. Fetch Data from Public Channels Table via Backend
+    async function fetchPublicChannels() {
+      try {
+        const res = await fetch('get_channels.php');
+        const data = await res.json();
+        const container = document.getElementById("channelsList");
+
+        if (data.status === "success" && data.data && data.data.length > 0) {
+          container.innerHTML = data.data.map(ch => `
+            <div style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <strong>${ch.channel_title}</strong>
+            </div>
+          `).join('');
+        } else {
+          container.innerText = "No public channels found.";
+        }
+      } catch (e) {
+        document.getElementById("channelsList").innerText = "Failed to load channels.";
+      }
+    }
+
+    // 4. Google Drive AppData Read / Search Logic
+    async function syncDriveData() {
+      const statusEl = document.getElementById("driveStatus");
+      statusEl.innerText = "Status: Searching AppData folder...";
+
+      try {
+        // Search if 'favorites.json' exists in appDataFolder
+        const res = await fetch("https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='favorites.json'", {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        const result = await res.json();
+
+        if (result.files && result.files.length > 0) {
+          driveFileId = result.files[0].id;
+          statusEl.innerText = "Status: Data file found! Fetching content...";
+          await readDriveFile(driveFileId);
+        } else {
+          statusEl.innerText = "Status: No existing file found. Creating initial file...";
+          await createDriveFile();
+        }
+      } catch (e) {
+        statusEl.innerText = "Status: Failed to sync with Google Drive.";
+      }
+    }
+
+    // Read file contents from Drive
+    async function readDriveFile(fileId) {
+      const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      const data = await res.json();
+      document.getElementById("favoritesDisplay").innerHTML = `<strong>Saved Items:</strong> ${JSON.stringify(data.favorites || [])}`;
+      document.getElementById("driveStatus").innerText = "Status: Data synced with Google Drive!";
+    }
+
+    // Create file in AppData folder if not existing
+    async function createDriveFile() {
+      const metadata = {
+        name: 'favorites.json',
+        parents: ['appDataFolder']
+      };
+
+      const initialContent = JSON.stringify({ favorites: ["Sample Video ID 1"] });
+
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+      form.append('file', new Blob([initialContent], { type: 'application/json' }));
+
+      const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: form
+      });
+      const file = await res.json();
+      driveFileId = file.id;
+      document.getElementById("driveStatus").innerText = "Status: File created in Google Drive!";
+      await readDriveFile(driveFileId);
+    }
+
+    // Write / Update file in Drive
+    async function saveFavoritesToDrive() {
+      if (!driveFileId || !accessToken) return;
+
+      const newFavorites = {
+        favorites: ["Song 1", "Song 2", "Added at " + new Date().toLocaleTimeString()]
+      };
+
+      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newFavorites)
+      });
+
+      document.getElementById("driveStatus").innerText = "Status: Updated Google Drive successfully!";
+      await readDriveFile(driveFileId);
+    }
+
+    // Logout
+    function logout() {
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - SL RAP</title>
+
+<!-- Google Identity Services Library & GAPI Integration -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://apis.google.com/js/api.js" async defer></script>
+
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background: #080c14;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 20px;
+  }
+
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(18, 24, 38, 0.85);
+    backdrop-filter: blur(12px);
+    padding: 12px 24px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 24px;
+  }
+
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .user-profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #3b82f6;
+  }
+
+  .logout-btn {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: rgba(18, 24, 38, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  h2 { font-size: 18px; margin-top: 0; color: #60a5fa; }
+  .sync-status { font-size: 13px; color: #94a3b8; margin-bottom: 15px; }
+  
+  .btn {
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <div class="navbar">
+    <div style="font-weight: 800; font-size: 20px; letter-spacing: 1px;">SL RAP</div>
+    <div class="user-profile">
+      <img id="userImg" src="" alt="Profile">
+      <div>
+        <div id="userName" style="font-weight: 600; font-size: 14px;">User</div>
+        <div id="userEmail" style="font-size: 12px; color: #94a3b8;">email</div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Dashboard Main Grid -->
+  <div class="grid-container">
+    <!-- Public Channels Box -->
+    <div class="card">
+      <h2>Public Rap Channels</h2>
+      <div id="channelsList" style="font-size: 14px; color: #94a3b8;">Loading channels from database...</div>
+    </div>
+
+    <!-- Private Drive Sync Box -->
+    <div class="card">
+      <h2>Private Data (Google Drive AppData)</h2>
+      <p class="sync-status" id="driveStatus">Status: Authorization Required</p>
+      <button class="btn" id="syncBtn" onclick="requestDriveAccessToken()">Sync / Load Drive Data</button>
+      <button class="btn" id="saveBtn" onclick="saveFavoritesToDrive()" style="display:none; background:#10b981;">Save Sample Favorite</button>
+      <div id="favoritesDisplay" style="margin-top: 15px; font-size: 13px; color: #cbd5e1;"></div>
+    </div>
+  </div>
+
+  <script>
+    const CLIENT_ID = '140925428903-r1sltvfvsmovqo1qlq39dqcvgbihunnt.apps.googleusercontent.com';
+    const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
+    
+    let tokenClient;
+    let accessToken = null;
+    let driveFileId = null;
+
+    // 1. Auth Guard & Page Load
+    window.onload = function() {
+      const name = localStorage.getItem("user_name");
+      const email = localStorage.getItem("user_email");
+      const pic = localStorage.getItem("user_picture");
+
+      if (!email) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      document.getElementById("userName").innerText = name || "User";
+      document.getElementById("userEmail").innerText = email || "";
+      document.getElementById("userImg").src = pic || "https://via.placeholder.com/40";
+
+      fetchPublicChannels();
+      initTokenClient();
+    };
+
+    // 2. Google OAuth Token Client (Drive Scope) Initializing
+    function initTokenClient() {
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: async (tokenResponse) => {
+          if (tokenResponse && tokenResponse.access_token) {
+            accessToken = tokenResponse.access_token;
+            document.getElementById("driveStatus").innerText = "Status: Connected to Google Drive AppData";
+            document.getElementById("saveBtn").style.display = "inline-block";
+            await syncDriveData();
+          }
+        },
+      });
+    }
+
+    function requestDriveAccessToken() {
+      tokenClient.requestAccessToken({ prompt: 'consent' });
+    }
+
+    // 3. Fetch Data from Public Channels Table via Backend
+    async function fetchPublicChannels() {
+      try {
+        const res = await fetch('get_channels.php');
+        const data = await res.json();
+        const container = document.getElementById("channelsList");
+
+        if (data.status === "success" && data.data && data.data.length > 0) {
+          container.innerHTML = data.data.map(ch => `
+            <div style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <strong>${ch.channel_title}</strong>
+            </div>
+          `).join('');
+        } else {
+          container.innerText = "No public channels found.";
+        }
+      } catch (e) {
+        document.getElementById("channelsList").innerText = "Failed to load channels.";
+      }
+    }
+
+    // 4. Google Drive AppData Read / Search Logic
+    async function syncDriveData() {
+      const statusEl = document.getElementById("driveStatus");
+      statusEl.innerText = "Status: Searching AppData folder...";
+
+      try {
+        // Search if 'favorites.json' exists in appDataFolder
+        const res = await fetch("https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='favorites.json'", {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        const result = await res.json();
+
+        if (result.files && result.files.length > 0) {
+          driveFileId = result.files[0].id;
+          statusEl.innerText = "Status: Data file found! Fetching content...";
+          await readDriveFile(driveFileId);
+        } else {
+          statusEl.innerText = "Status: No existing file found. Creating initial file...";
+          await createDriveFile();
+        }
+      } catch (e) {
+        statusEl.innerText = "Status: Failed to sync with Google Drive.";
+      }
+    }
+
+    // Read file contents from Drive
+    async function readDriveFile(fileId) {
+      const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      const data = await res.json();
+      document.getElementById("favoritesDisplay").innerHTML = `<strong>Saved Items:</strong> ${JSON.stringify(data.favorites || [])}`;
+      document.getElementById("driveStatus").innerText = "Status: Data synced with Google Drive!";
+    }
+
+    // Create file in AppData folder if not existing
+    async function createDriveFile() {
+      const metadata = {
+        name: 'favorites.json',
+        parents: ['appDataFolder']
+      };
+
+      const initialContent = JSON.stringify({ favorites: ["Sample Video ID 1"] });
+
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+      form.append('file', new Blob([initialContent], { type: 'application/json' }));
+
+      const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: form
+      });
+      const file = await res.json();
+      driveFileId = file.id;
+      document.getElementById("driveStatus").innerText = "Status: File created in Google Drive!";
+      await readDriveFile(driveFileId);
+    }
+
+    // Write / Update file in Drive
+    async function saveFavoritesToDrive() {
+      if (!driveFileId || !accessToken) return;
+
+      const newFavorites = {
+        favorites: ["Song 1", "Song 2", "Added at " + new Date().toLocaleTimeString()]
+      };
+
+      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newFavorites)
+      });
+
+      document.getElementById("driveStatus").innerText = "Status: Updated Google Drive successfully!";
+      await readDriveFile(driveFileId);
+    }
+
+    // Logout
+    function logout() {
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
+  </script>
 </body>
 </html>
