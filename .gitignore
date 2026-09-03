@@ -1,0 +1,7 @@
+# Sensitive Data & Certificates
+ca.pem
+config.php
+.env
+
+# PHP Error Logs
+*.log
