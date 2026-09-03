@@ -11,38 +11,83 @@
 <style>
   * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
 
   body {
-    background: #080c14;
+    background: #060911;
     color: #ffffff;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    margin: 0;
     padding: 20px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Background Ambient Glows */
+  body::before {
+    content: '';
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(0,0,0,0) 70%);
+    top: 15%;
+    left: 20%;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(0,0,0,0) 70%);
+    bottom: 15%;
+    right: 20%;
+    z-index: 0;
   }
 
   .container {
+    position: relative;
+    z-index: 1;
     width: 100%;
-    max-width: 400px;
-    padding: 40px 30px;
-    background: rgba(18, 24, 38, 0.85);
-    backdrop-filter: blur(12px);
+    max-width: 420px;
+    padding: 44px 36px;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 24px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border-radius: 28px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
     text-align: center;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+
+  .brand-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #60a5fa;
+    text-transform: uppercase;
+    margin-bottom: 20px;
   }
 
   h1 {
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 800;
-    margin: 0 0 12px 0;
-    letter-spacing: 2px;
-    background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+    margin-bottom: 12px;
+    letter-spacing: 1.5px;
+    background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -51,23 +96,50 @@
     font-size: 13.5px;
     color: #94a3b8;
     line-height: 1.6;
-    margin: 0 0 28px 0;
+    margin-bottom: 28px;
     text-align: left;
-    background: rgba(15, 23, 42, 0.6);
-    padding: 16px;
+    background: rgba(8, 12, 20, 0.5);
+    padding: 16px 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  /* Modern Professional Custom Google Button */
+  .custom-google-btn {
+    position: relative;
+    width: 100%;
+    height: 52px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 245, 249, 0.9) 100%);
+    color: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  /* Google Native Button Container Styling */
-  .google-btn-wrapper {
+    font-size: 15px;
+    font-weight: 600;
     display: flex;
-    justify-content: center;
     align-items: center;
-    min-height: 48px;
-    margin-top: 10px;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   }
 
+  .custom-google-btn:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.25);
+  }
+
+  .custom-google-btn:active {
+    transform: translateY(0);
+  }
+
+  .custom-google-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Privacy Checkbox Styles */
   .checkbox-container {
     margin-top: 24px;
     font-size: 13px;
@@ -75,15 +147,41 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
+    user-select: none;
   }
 
   .checkbox-container input[type="checkbox"] {
-    accent-color: #3b82f6;
-    width: 17px;
-    height: 17px;
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.05);
+    outline: none;
     cursor: pointer;
-    border-radius: 4px;
+    position: relative;
+    transition: all 0.2s ease;
+  }
+
+  .checkbox-container input[type="checkbox"]:checked {
+    background: #3b82f6;
+    border-color: #3b82f6;
+  }
+
+  .checkbox-container input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    top: -2px;
+    left: 3px;
+  }
+
+  .checkbox-container label {
+    cursor: pointer;
   }
 
   .checkbox-container a {
@@ -95,56 +193,157 @@
   .checkbox-container a:hover {
     text-decoration: underline;
   }
+
+  /* Shake Effect & Toast Alert */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+
+  .shake-error {
+    animation: shake 0.4s ease-in-out;
+    border-color: rgba(239, 68, 68, 0.6) !important;
+  }
+
+  .alert-toast {
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(239, 68, 68, 0.95);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 20px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+  }
+
+  .alert-toast.show {
+    bottom: -40px;
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>LOGIN</h1>
+  <div class="container" id="loginContainer">
+    <div class="brand-badge">SL RAP PLATFORM</div>
+    <h1>ACCOUNT LOGIN</h1>
     
     <p class="description-text">
-      Welcome to SL RAP! By continuing with Google authentication, you get seamless access to your customized dashboard, secure profile management, and premium features.
+      Welcome to SL RAP! Access your customized dashboard, private Drive sync features, and manage your profile securely via Google Authentication.
     </p>
     
-    <!-- Google Native Official Button Slot -->
-    <div class="google-btn-wrapper">
-      <div id="googleSignInBtn"></div>
-    </div>
+    <!-- Modern Custom Google Button -->
+    <button class="custom-google-btn" id="loginBtn" onclick="handleCustomGoogleLogin()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+      </svg>
+      <span id="btnText">Continue with Google</span>
+    </button>
     
     <div class="checkbox-container">
       <input type="checkbox" id="privacy">
       <label for="privacy">I Accept <a href="Privacy_Policy.html" target="_blank">Privacy Policy</a></label>
     </div>
+
+    <!-- Alert Toast Message -->
+    <div class="alert-toast" id="alertToast">⚠️ Please accept the Privacy Policy first!</div>
   </div>
 
   <script>
-    async function handleCredentialResponse(response) {
-      const isAccepted = document.getElementById('privacy').checked;
-      
-      if (!isAccepted) {
-        alert("Please accept the Privacy Policy before signing in!");
+    let tokenClient;
+
+    // 1. Google OAuth Token Client Initializing
+    function initGoogleAuth() {
+      if (typeof google === 'undefined' || !google.accounts) {
+        setTimeout(initGoogleAuth, 300);
         return;
       }
 
-      // JWT Decode
-      const responsePayload = parseJwt(response.credential);
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: '140925428903-r1sltvfvsmovqo1qlq39dqcvgbihunnt.apps.googleusercontent.com',
+        scope: 'email profile openid',
+        callback: async (tokenResponse) => {
+          if (tokenResponse.access_token) {
+            await fetchUserProfile(tokenResponse.access_token);
+          }
+        },
+      });
+    }
 
-      localStorage.setItem("user_google_id", responsePayload.sub);
-      localStorage.setItem("user_name", responsePayload.name);
-      localStorage.setItem("user_email", responsePayload.email);
-      localStorage.setItem("user_picture", responsePayload.picture);
+    // 2. Button Click Handler with Privacy Check Validation
+    function handleCustomGoogleLogin() {
+      const isAccepted = document.getElementById('privacy').checked;
+      
+      if (!isAccepted) {
+        triggerPrivacyError();
+        return;
+      }
+
+      if (!tokenClient) {
+        alert("Google Login service is loading... Please wait a second and try again.");
+        initGoogleAuth();
+        return;
+      }
+
+      // Open Official Google Account Choice Popup
+      tokenClient.requestAccessToken();
+    }
+
+    // Privacy Shake Animation Trigger
+    function triggerPrivacyError() {
+      const container = document.getElementById('loginContainer');
+      const toast = document.getElementById('alertToast');
+
+      container.classList.add('shake-error');
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        container.classList.remove('shake-error');
+      }, 400);
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // 3. Fetch User Profile Data & Connect to backend `login.php`
+    async function fetchUserProfile(accessToken) {
+      const btn = document.getElementById('loginBtn');
+      const btnText = document.getElementById('btnText');
+
+      btn.disabled = true;
+      btnText.innerText = "Signing in...";
 
       try {
+        const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        const profile = await userInfoRes.json();
+
+        localStorage.setItem("user_google_id", profile.sub);
+        localStorage.setItem("user_name", profile.name);
+        localStorage.setItem("user_email", profile.email);
+        localStorage.setItem("user_picture", profile.picture);
+
         const res = await fetch('login.php', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            google_id: responsePayload.sub,
-            name: responsePayload.name,
-            email: responsePayload.email,
-            profile_pic: responsePayload.picture
+            google_id: profile.sub,
+            name: profile.name,
+            email: profile.email,
+            profile_pic: profile.picture
           })
         });
 
@@ -154,48 +353,23 @@
           window.location.href = "Home_Page.html";
         } else {
           alert("Database Error: " + data.message);
+          resetBtn();
         }
       } catch (error) {
-        console.error("Login Fetch Error:", error);
-        window.location.href = "Home_Page.html"; 
+        console.error("Login Error:", error);
+        window.location.href = "Home_Page.html";
       }
     }
 
-    function parseJwt(token) {
-      var base64Url = token.split('.')[1];
-      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-
-      return JSON.parse(jsonPayload);
-    }
-
-    function initGoogleBtn() {
-      if (typeof google !== 'undefined' && google.accounts) {
-        google.accounts.id.initialize({
-          client_id: "140925428903-r1sltvfvsmovqo1qlq39dqcvgbihunnt.apps.googleusercontent.com",
-          callback: handleCredentialResponse
-        });
-
-        // Official Google Button එක Render කිරීම
-        google.accounts.id.renderButton(
-          document.getElementById("googleSignInBtn"),
-          { 
-            theme: "outline", 
-            size: "large",
-            width: 320,
-            text: "continue_with",
-            shape: "pill"
-          }
-        );
-      } else {
-        setTimeout(initGoogleBtn, 200);
-      }
+    function resetBtn() {
+      const btn = document.getElementById('loginBtn');
+      const btnText = document.getElementById('btnText');
+      btn.disabled = false;
+      btnText.innerText = "Continue with Google";
     }
 
     window.onload = function () {
-      initGoogleBtn();
+      initGoogleAuth();
     };
   </script>
 </body>
