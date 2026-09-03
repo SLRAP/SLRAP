@@ -1,16 +1,3 @@
-# Secret Credentials & Environment Variables
 .env
-config.php
 ca.pem
-
-# PHP Logs & Cache
-*.log
-error_log
-
-# OS Generated Files
-.DS_Store
-Thumbs.db
-
-# Editor Settings
-.vscode/
-.idea/
+vendor/
