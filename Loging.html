@@ -59,43 +59,13 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
-  .custom-google-btn {
-    width: 100%;
-    height: 48px;
-    background: #ffffff;
-    color: #1f2937;
-    border: none;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 600;
+  /* Google Native Button Container Styling */
+  .google-btn-wrapper {
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 12px;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-  }
-
-  .custom-google-btn:hover {
-    background: #f8fafc;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.15);
-  }
-
-  .custom-google-btn:active {
-    transform: translateY(0);
-  }
-
-  .custom-google-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  .custom-google-btn svg {
-    width: 20px;
-    height: 20px;
+    align-items: center;
+    min-height: 48px;
+    margin-top: 10px;
   }
 
   .checkbox-container {
@@ -136,15 +106,10 @@
       Welcome to SL RAP! By continuing with Google authentication, you get seamless access to your customized dashboard, secure profile management, and premium features.
     </p>
     
-    <button class="custom-google-btn" id="loginBtn" onclick="handleCustomGoogleLogin()">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-      </svg>
-      <span id="btnText">Continue with Google</span>
-    </button>
+    <!-- Google Native Official Button Slot -->
+    <div class="google-btn-wrapper">
+      <div id="googleSignInBtn"></div>
+    </div>
     
     <div class="checkbox-container">
       <input type="checkbox" id="privacy">
@@ -153,7 +118,7 @@
   </div>
 
   <script>
-    function handleCustomGoogleLogin() {
+    async function handleCredentialResponse(response) {
       const isAccepted = document.getElementById('privacy').checked;
       
       if (!isAccepted) {
@@ -161,28 +126,15 @@
         return;
       }
 
-      // Trigger Google One Tap / Sign-In Prompt Directly
-      google.accounts.id.prompt();
-    }
-
-    async function handleCredentialResponse(response) {
-      const btn = document.getElementById('loginBtn');
-      const btnText = document.getElementById('btnText');
-
-      btn.disabled = true;
-      btnText.innerText = "Signing in...";
-
-      // Google Token එක Decode කර ගැනීම
+      // JWT Decode
       const responsePayload = parseJwt(response.credential);
 
-      // Local storage හි දත්ත තබා ගැනීම (Front-end UI සඳහා)
       localStorage.setItem("user_google_id", responsePayload.sub);
       localStorage.setItem("user_name", responsePayload.name);
       localStorage.setItem("user_email", responsePayload.email);
       localStorage.setItem("user_picture", responsePayload.picture);
 
       try {
-        // Backend (`login.php`) වෙත Data යැවීම
         const res = await fetch('login.php', {
           method: 'POST',
           headers: {
@@ -199,22 +151,14 @@
         const data = await res.json();
 
         if (data.status === "success") {
-          window.location.href = "home.html";
+          window.location.href = "Home_Page.html";
         } else {
           alert("Database Error: " + data.message);
-          resetBtn();
         }
       } catch (error) {
         console.error("Login Fetch Error:", error);
-        window.location.href = "home.html"; 
+        window.location.href = "Home_Page.html"; 
       }
-    }
-
-    function resetBtn() {
-      const btn = document.getElementById('loginBtn');
-      const btnText = document.getElementById('btnText');
-      btn.disabled = false;
-      btnText.innerText = "Continue with Google";
     }
 
     function parseJwt(token) {
@@ -227,13 +171,32 @@
       return JSON.parse(jsonPayload);
     }
 
-    window.onload = function () {
-      google.accounts.id.initialize({
-        client_id: "140925428903-r1sltvfvsmovqo1qlq39dqcvgbihunnt.apps.googleusercontent.com",
-        callback: handleCredentialResponse,
-        auto_select: false
-      });
+    function initGoogleBtn() {
+      if (typeof google !== 'undefined' && google.accounts) {
+        google.accounts.id.initialize({
+          client_id: "140925428903-r1sltvfvsmovqo1qlq39dqcvgbihunnt.apps.googleusercontent.com",
+          callback: handleCredentialResponse
+        });
+
+        // Official Google Button එක Render කිරීම
+        google.accounts.id.renderButton(
+          document.getElementById("googleSignInBtn"),
+          { 
+            theme: "outline", 
+            size: "large",
+            width: 320,
+            text: "continue_with",
+            shape: "pill"
+          }
+        );
+      } else {
+        setTimeout(initGoogleBtn, 200);
+      }
     }
+
+    window.onload = function () {
+      initGoogleBtn();
+    };
   </script>
 </body>
 </html>
